@@ -17,36 +17,36 @@ class Selenium_Action_Objects:
         "Return current driver."
         return self.driver
 
-    def get_element(self,locator,verbose_flag=True):
-        "Return the DOM element of the path or 'None' if the element is not found "
+    def get_element(self, locator, verbose_flag=True):
         dom_element = None
         try:
-            locator = self.split_locator(locator)
+            # locator must be a tuple
             dom_element = self.driver.find_element(*locator)
             if self.highlight_flag is True:
                 self.highlight_element(dom_element)
         except Exception as e:
             if verbose_flag is True:
                 self.write(str(e),'critical')
-                self.write("Check your locator-'%s,%s' in the conf/locators.conf file" %(locator[0],locator[1]))
-            self.exceptions.append("Check your locator-'%s,%s' in the conf/locators.conf file" %(locator[0],locator[1]))
-
+                self.write("Check your locator-'%s,%s' in the conf/locators.conf file" % (locator[0], locator[1]))
+            self.exceptions.append("Check your locator-'%s,%s' in the conf/locators.conf file" % (locator[0], locator[1]))
         return dom_element
 
-    def get_elements(self,locator,msg_flag=True):
-        "Return a list of DOM elements that match the locator"
+    def get_elements(self, locator, msg_flag=True):
         dom_elements = []
         try:
-            locator = self.split_locator(locator)
+            # locator must be a tuple
             dom_elements = self.driver.find_elements(*locator)
             if self.highlight_flag is True:
                 self.highlight_elements(dom_elements)
         except Exception as e:
-            if msg_flag==True:
+            if isinstance(locator, tuple) and len(locator) == 2:
+                loc_type, loc_val = locator
+            else:
+                loc_type, loc_val = str(locator), ""
+            if msg_flag:
                 self.write(str(e),'critical')
-                self.write("Check your locator-'%s,%s' in the conf/locators.conf file" %(locator[0],locator[1]))
-            self.exceptions.append("Unable to locate the element with the xpath -'%s,%s' in the conf/locators.conf file"%(locator[0],locator[1]))
-
+                self.write("Check your locator-'%s,%s' in the conf/locators.conf file" % (loc_type, loc_val))
+            self.exceptions.append("Unable to locate the element with the xpath -'%s,%s' in the conf/locators.conf file" % (loc_type, loc_val))
         return dom_elements
 
     def get_page_paths(self,section):
@@ -72,34 +72,31 @@ class Selenium_Action_Objects:
         else:
             time.sleep(wait_seconds)
 
-    def smart_wait(self,locator,wait_seconds=5):
+    def smart_wait(self, locator, wait_seconds=5):
         "Performs an explicit wait for a particular element"
         result_flag = False
         try:
-            path = self.split_locator(locator)
-            WebDriverWait(self.driver, wait_seconds).until(EC.presence_of_element_located(path))
-            result_flag =True
+            WebDriverWait(self.driver, wait_seconds).until(EC.presence_of_element_located(locator))
+            result_flag = True
         except Exception:
-	        self.conditional_write(result_flag,
-                    positive='Located the element: %s'%locator,
-                    negative='Could not locate the element %s even after %.1f seconds'%(locator,wait_seconds))
-
+            self.conditional_write(result_flag,
+                positive='Located the element: {} {}'.format(locator[0], locator[1]),
+                negative='Could not locate the element {} {} even after {:.1f} seconds'.format(locator[0], locator[1], wait_seconds))
         return result_flag
 
-    def click_element(self,locator,wait_time=3):
+    def click_element(self, locator, wait_time=3):
         "Click the button supplied"
         result_flag = False
         try:
             link = self.get_element(locator)
             if link is not None:
                 link.click()
-                result_flag=True
+                result_flag = True
                 self.wait(wait_time)
         except Exception as e:
-            self.write(str(e),'critical')
-            self.write('Exception when clicking link with path: %s'%locator)
-            self.exceptions.append("Error when clicking the element with path,'%s' in the conf/locators.conf file"%locator)
-
+            self.write(str(e), 'critical')
+            self.write('Exception when clicking link with path: {} {}'.format(locator[0], locator[1]))
+            self.exceptions.append("Error when clicking the element with path, '{} {}' in the conf/locators.conf file".format(locator[0], locator[1]))
         return result_flag
 
     def set_text(self,locator,value,clear_flag=True):
@@ -129,7 +126,7 @@ class Selenium_Action_Objects:
 
         return result_flag
 
-    def get_text(self, by, locator):
+    def get_text(self,locator, dom_element_flag=False):
         "Return the text for a given path or the 'None' object if the element is not found"
         text = ''
         try:
@@ -322,3 +319,5 @@ class Selenium_Action_Objects:
             result_flag = False
 
         return result_flag
+
+    find_elements = get_elements

@@ -1,9 +1,11 @@
 # --- weather_shopper_home_page.py ---
+import re
 from core_helpers.web_app_helper import Web_App_Helper
 from conf import base_url_conf as url_conf
 import conf.locators_conf as conf
 from selenium.webdriver.common.by import By
-import re
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 class WeatherShopperHomePage(Web_App_Helper):
     """Page object for Weather Shopper home page"""
@@ -18,8 +20,12 @@ class WeatherShopperHomePage(Web_App_Helper):
 
     def get_temperature(self):
         try:
-            temp_text = self.get_text(By.ID, conf.TEMPERATURE_ID)
-            if not isinstance(temp_text, str) or not temp_text:
+            # Wait until the temperature element's text is not empty
+            WebDriverWait(self.driver, 10).until(
+                lambda d: d.find_element(By.ID, conf.TEMPERATURE_ID).text.strip() != ""
+            )
+            temp_text = self.driver.find_element(By.ID, conf.TEMPERATURE_ID).text
+            if not temp_text:
                 self.write("❌ Could not find temperature element or text.")
                 return None
             temperature = int(re.sub(r"[^\d]", "", temp_text))
@@ -27,6 +33,7 @@ class WeatherShopperHomePage(Web_App_Helper):
             return temperature
         except Exception as e:
             self.write(f"❌ Could not read temperature: {e}")
+            self.write(self.driver.page_source)  # For debugging
             return None
 
     def click_product_button(self, product_type):
@@ -39,7 +46,11 @@ class WeatherShopperHomePage(Web_App_Helper):
                 self.write(f"❌ Invalid product type: {product_type}")
                 return False
 
-            self.click_element(By.XPATH, button_xpath)
+            self.click_element((By.XPATH, button_xpath))
+            # Wait for the product page to load by checking for the product container
+            WebDriverWait(self.driver, 10).until(
+                EC.presence_of_element_located((By.XPATH, conf.PRODUCT_CONTAINER))
+            )
             return True
         except Exception as e:
             self.write(f"❌ Failed to click product button: {e}")
