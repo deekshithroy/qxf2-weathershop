@@ -3,9 +3,15 @@ from selenium.webdriver.common.by import By
 import conf.locators_conf as conf
 import re
 import time
+from core_helpers.web_app_helper import Web_App_Helper
+from conf import base_url_conf as url_conf
 
-class WeatherShopperProductPage():
+class WeatherShopperProductPage(Web_App_Helper):
     """Page object for Weather Shopper product selection page"""
+    def __init__(self, base_url=None):
+        if base_url is None:
+            base_url = url_conf.ui_base_url
+        super().__init__(base_url)
 
     def select_cheapest_and_expensive(self):
         try:

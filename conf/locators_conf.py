@@ -12,6 +12,7 @@
 #XPATH
 ###########################################
 
+BASE_URL = "https://weathershopper.pythonanywhere.com/"
 # Temperature threshold
 TEMP_THRESHOLD = 30
 
@@ -45,4 +46,3 @@ EMAIL = "dheekshi@gmail.com"
 CARD_NUMBER = "4242 4242 4242 4242"
 EXPIRY = "12/25"
 CVC = "123"
-

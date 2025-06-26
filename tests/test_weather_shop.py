@@ -1,4 +1,4 @@
-# --- test_weather_shopper.py ---
+# --- test_weather_shop.py ---
 """
 Test case for Weather Shopper using Qxf2-style framework
 """
@@ -8,7 +8,7 @@ from page_objects.PageFactory import PageFactory
 import conf.locators_conf as conf
 
 @pytest.mark.GUI
-def weather_shop_test(test_obj):
+def test_weather_shop(test_obj):
     "Run end-to-end Weather Shopper test"
     try:
         expected_pass = 0
@@ -18,8 +18,14 @@ def weather_shop_test(test_obj):
 
         # 1. Get home page and read temperature
         home_page = PageFactory.get_page_object("weathershopper home page")
+        home_page.start()
         temperature = home_page.get_temperature()
         test_obj.log_result(temperature is not None, "Temperature fetched", "Failed to fetch temperature")
+        if temperature is None:
+            expected_pass = test_obj.result_counter
+            actual_pass = test_obj.pass_counter
+            assert expected_pass == actual_pass
+            return
 
         # 2. Navigate to products page
         product_type = "sunscreen" if temperature > conf.TEMP_THRESHOLD else "moisturizer"

@@ -129,7 +129,7 @@ class Selenium_Action_Objects:
 
         return result_flag
 
-    def get_text(self,locator, dom_element_flag=False):
+    def get_text(self, by, locator):
         "Return the text for a given path or the 'None' object if the element is not found"
         text = ''
         try:
