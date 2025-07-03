@@ -1,48 +1,30 @@
-#Common locator file for all locators
+from selenium.webdriver.common.by import By
+
 #Locators are ordered alphabetically
 
-############################################
-#Selectors we can use
-#ID
-#NAME
-#css selector
-#CLASS_NAME
-#LINK_TEXT
-#PARTIAL_LINK_TEXT
-#XPATH
-###########################################
 
-BASE_URL = "https://weathershopper.pythonanywhere.com/"
-# Temperature threshold
-TEMP_THRESHOLD = 30
+#Locators for the weather shopper home page object(weather_home_object.py)
+temperature_field = (By.ID, "temperature")
+buy_sunscreens_btn = (By.XPATH, "//button[text()='Buy sunscreens']")
+buy_moisturizers_btn = (By.XPATH, "//button[text()='Buy moisturizers']")
+#----
 
-# Wait times
-IMPLICIT_WAIT = 10
-PAGE_LOAD_WAIT = 3
-ELEMENT_INTERACTION_WAIT = 1
-CLEANUP_WAIT = 2
+#Locators for the product page object(product_page_object.py)
+product_container = (By.XPATH, "//p[contains(text(),'Price')]/..")
+product_price = (By.XPATH, "./p[contains(text(),'Price')]")
+product_name = (By.XPATH, "./p[1]")
+cart_btn = (By.XPATH, "//button[contains(text(),'Cart')]")
+#----
 
-# Navigation buttons
-BUY_SUNSCREENS_BTN = "//button[text()='Buy sunscreens']"
-BUY_MOISTURIZERS_BTN = "//button[text()='Buy moisturizers']"
-CART_BTN = "//button[contains(text(),'Cart')]"
+#Locators for the cart page object(cart_page_object.py)
+stripe_btn = (By.CSS_SELECTOR, "button.stripe-button-el")
+#----
 
-# Product elements
-PRODUCT_CONTAINER = "//p[contains(text(),'Price')]/.."
-PRODUCT_PRICE = "./p[contains(text(),'Price')]"
-PRODUCT_NAME = "./p[1]"
-
-# Checkout elements
-STRIPE_BTN = "button.stripe-button-el"
-STRIPE_IFRAME = "iframe[name='stripe_checkout_app']"
-STRIPE_PAY_BTN = "//span[contains(text(),'Pay INR')]"
-SUCCESS_MSG = "//*[contains(text(),'success')]"
-
-# Temperature element
-TEMPERATURE_ID = "temperature"
-
-# Stripe dummy data
-EMAIL = "dheekshi@gmail.com"
-CARD_NUMBER = "4242 4242 4242 4242"
-EXPIRY = "12/25"
-CVC = "123"
+#Locators for the payment object(payment_object.py)
+stripe_iframe = (By.CSS_SELECTOR, "iframe[name='stripe_checkout_app']")
+email_field = (By.ID, "email")
+card_number_field = (By.ID, "card_number")
+expiry_field = (By.ID, "cc-exp")
+cvc_field = (By.ID, "cc-csc")
+stripe_pay_btn = (By.XPATH, "//span[contains(text(),'Pay INR')]")
+success_msg = (By.XPATH, "//*[contains(text(),'success')]")
