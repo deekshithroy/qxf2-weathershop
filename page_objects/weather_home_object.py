@@ -1,4 +1,5 @@
 # page_objects/weather_home_page.py
+# page_objects/weather_home_page.py
 import re
 from core_helpers.web_app_helper import Web_App_Helper
 from utils.Wrapit import Wrapit
@@ -13,31 +14,55 @@ class Weather_Home_Object(Web_App_Helper):
     buy_moisturizers_btn = locators.buy_moisturizers_btn
 
     @Wrapit._exceptionHandler
-    def get_temperature(self):
+    @Wrapit._screenshot
+    def get_temperature(self):  
         temp_text = self.get_text(self.temperature_field)
+        result_flag = False
+        temperature = None
+        
         if isinstance(temp_text, bytes):
             temp_text = temp_text.decode("utf-8")
-        match = re.search(r"(\d+)", temp_text or "")  # Fixed regex
-        temperature = int(match.group(1)) if match else None
-        self.write(f"Current temperature: {temperature}°C" if temperature else "Temperature not found")
-        return temperature
+
+        match = re.search(r"(\d+)", temp_text or "")
+        if match:
+            temperature = int(match.group(1))
+            result_flag = True
+            
+        self.conditional_write(result_flag, 
+            positive=f"Temperature found: {temperature}°C",
+            negative=f"Could not extract temperature from text: '{temp_text}'",
+            level='debug')
+
+        return temperature, result_flag
 
     @Wrapit._exceptionHandler
+    @Wrapit._screenshot
     def decide_product_type(self, temperature, temp_threshold):
-        if temperature is None:
-            self.write("Temperature is None - cannot decide product type")
-            return None
-        if temperature > temp_threshold:
-            self.write(f"{temperature}°C > {temp_threshold}°C → Sunscreens")
+        result_flag = True
+        is_sunscreen = temperature > temp_threshold
+        
+        if is_sunscreen:
+            self.conditional_write(result_flag,
+                positive=f"{temperature}°C > {temp_threshold}°C → Sunscreens",
+                negative="",
+                level='debug')
             return ("sunscreen", self.buy_sunscreens_btn)
         else:
-            self.write(f"{temperature}°C ≤ {temp_threshold}°C → Moisturizers")
+            self.conditional_write(result_flag,
+                positive=f"{temperature}°C ≤ {temp_threshold}°C → Moisturizers",
+                negative="",
+                level='debug')
             return ("moisturizer", self.buy_moisturizers_btn)
 
     @Wrapit._exceptionHandler
+    @Wrapit._screenshot
     def navigate_to_product_page(self, button_locator):
         result_flag = self.click_element(button_locator)
+        if result_flag:
+            self.switch_page("product page")
+            
         self.conditional_write(result_flag,
             positive="Successfully navigated to product page",
-            negative="Failed to navigate to product page")
+            negative="Failed to navigate to product page",
+            level='debug')
         return result_flag

@@ -13,3 +13,5 @@ debug.log
 __pycache__
 venv*
 .env*
+.env.remote
+env

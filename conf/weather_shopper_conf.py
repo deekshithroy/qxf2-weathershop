@@ -6,7 +6,7 @@ Conf file for test_weather_shopper
 temp_threshold = 30
 
 # Stripe test payment information
-email = "dheekshi@gmail.com"
+email = "deekshi@gmail.com"
 card_number = "4242 4242 4242 4242"
 expiry = "12/25"
 cvc = "123"

@@ -22,8 +22,10 @@ from page_objects.PageFactory import PageFactory    # pylint: disable=import-err
 from utils import interactive_mode                  # pylint: disable=import-error wrong-import-position
 from core_helpers.custom_pytest_plugins import CustomTerminalReporter # pylint: disable=import-error wrong-import-position
 from core_helpers.logging_objects import Logging_Objects  # pylint: disable=import-error wrong-import-position
-# from api_auto_generator.endpoint_name_generator import NameGenerator
-# from api_auto_generator.openapi_spec_parser import OpenAPISpecParser
+from api_auto_generator.endpoint_name_generator import NameGenerator
+from api_auto_generator.openapi_spec_parser import OpenAPISpecParser
+import pytest
+  
 
 load_dotenv()
 
@@ -234,23 +236,23 @@ def test_mobile_obj(mobile_os_name, mobile_os_version, device_name, app_package,
                             {"action": "setSessionStatus", "arguments":
                             {"status":"failed", "reason": "Exception occured"}}""")
 
-# @pytest.fixture
-# def test_api_obj(interactivemode_flag, testname, api_url):  # pylint: disable=redefined-outer-name
-#     "Return an instance of Base Page that knows about the third party integrations"
-#     log_file = testname + '.log'
-#     try:
-#         if interactivemode_flag.lower()=='y':
-#             api_url = interactive_mode.ask_questions_api(api_url)
-#             test_api_obj = APIPlayer(api_url,                                         # pylint: disable=redefined-outer-name
-#                                       log_file_path=log_file)
-#         else:
-#             test_api_obj = APIPlayer(url=api_url,
-#                                       log_file_path=log_file)
-#         yield test_api_obj
+@pytest.fixture
+def test_api_obj(interactivemode_flag, testname, api_url):  # pylint: disable=redefined-outer-name
+    "Return an instance of Base Page that knows about the third party integrations"
+    log_file = testname + '.log'
+    try:
+        if interactivemode_flag.lower()=='y':
+            api_url = interactive_mode.ask_questions_api(api_url)
+            test_api_obj = APIPlayer(api_url,                                         # pylint: disable=redefined-outer-name
+                                      log_file_path=log_file)
+        else:
+            test_api_obj = APIPlayer(url=api_url,
+                                      log_file_path=log_file)
+        yield test_api_obj
 
-#     except Exception as e:                    # pylint: disable=broad-exception-caught
-#         print(Logging_Objects.color_text(f"Exception when trying to run test:{__file__}","red"))
-#         print(Logging_Objects.color_text(f"Python says:{str(e)}","red"))
+    except Exception as e:                    # pylint: disable=broad-exception-caught
+        print(Logging_Objects.color_text(f"Exception when trying to run test:{__file__}","red"))
+        print(Logging_Objects.color_text(f"Python says:{str(e)}","red"))
 
 # Fixtures for API Endpoint Auto generation unit tests
 @pytest.fixture
