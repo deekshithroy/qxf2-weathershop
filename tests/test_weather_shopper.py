@@ -35,6 +35,7 @@ def test_weather_shopper(test_obj):
         card_number = conf.card_number
         expiry = conf.expiry
         cvc = conf.cvc
+        zip_code = conf.zip_code
 
         # Step 1: Load Home Page
         test_obj = PageFactory.get_page_object("weather home page", base_url=test_obj.base_url)
@@ -98,7 +99,7 @@ def test_weather_shopper(test_obj):
                 negative="Failed to switch to Stripe iframe")
 
         if result_flag:
-            result_flag = test_obj.process_payment(email, card_number, expiry, cvc)
+            result_flag = test_obj.process_payment(email, card_number, expiry, cvc, zip_code)
             test_obj.log_result(result_flag,
                 positive="Stripe payment flow succeeded",
                 negative="Stripe payment flow failed")

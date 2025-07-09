@@ -17,6 +17,7 @@ class Payment_Page_Object(Web_App_Helper):
     cvc_field = locators.cvc_field
     stripe_pay_btn = locators.stripe_pay_btn
     success_msg = locators.success_msg
+    zip_code_field = locators.zip_code_field
 
     @Wrapit._exceptionHandler
     @Wrapit._screenshot
@@ -37,14 +38,22 @@ class Payment_Page_Object(Web_App_Helper):
         
     @Wrapit._exceptionHandler
     @Wrapit._screenshot
-    def fill_payment_details(self, email, card_number, expiry, cvc):
+    def fill_payment_details(self, email, card_number, expiry, cvc, zip_code):
         "Fill payment details in Stripe form using normal set_text"
 
         result_flag = self.set_text(self.email_field, email)
-        result_flag &= self.set_text(self.card_number_field, card_number)
-        result_flag &= self.set_text(self.expiry_field, expiry)
+       
+        for digit in card_number:
+            result_flag &= self.set_text(self.card_number_field, digit, clear_flag=False)
+    
+        # Wait for card number to be processed
+        for digit in expiry:
+            result_flag &= self.set_text(self.expiry_field, digit, clear_flag=False)
+      
         result_flag &= self.set_text(self.cvc_field, cvc)
-
+        
+        result_flag &= self.set_text(self.zip_code_field, zip_code)
+        
         self.conditional_write(result_flag,
         positive="Successfully filled payment details",
         negative="Failed to fill payment details",
@@ -81,10 +90,10 @@ class Payment_Page_Object(Web_App_Helper):
 
     @Wrapit._exceptionHandler
     @Wrapit._screenshot
-    def process_payment(self, email, card_number, expiry, cvc):
+    def process_payment(self, email, card_number, expiry, cvc, zip_code):
         "Complete Stripe payment steps - assumes already inside iframe"
 
-        result_flag = self.fill_payment_details(email, card_number, expiry, cvc)
+        result_flag = self.fill_payment_details(email, card_number, expiry, cvc, zip_code)
         self.conditional_write(result_flag,
             positive="Filled payment details",
             negative="Failed to fill payment details")

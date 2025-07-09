@@ -10,7 +10,7 @@ email = "deekshi@gmail.com"
 card_number = "4242 4242 4242 4242"
 expiry = "12/25"
 cvc = "123"
-
+zip_code = "12345"
 # Browser wait times (in seconds)
 implicit_wait = 10
 page_load_wait = 3
