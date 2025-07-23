@@ -15,3 +15,7 @@ venv*
 .env*
 .env.remote
 env
+run_weather_shopper_firefox.py
+Dockerfile
+entrypoint.sh
+build_and_run.sh
