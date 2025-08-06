@@ -31,17 +31,27 @@ jobs:
           wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
           sudo apt install -y ./google-chrome-stable_current_amd64.deb
 
-      - name: Install ChromeDriver
+      - name: Install ChromeDriver matching Chrome version
         run: |
-          CHROME_VERSION=$(google-chrome --version | cut -d " " -f 3 | cut -d "." -f 1)
-          wget https://chromedriver.storage.googleapis.com/${CHROME_VERSION}.0.0/chromedriver_linux64.zip
-          unzip chromedriver_linux64.zip
-          sudo mv chromedriver /usr/local/bin/
+          sudo apt-get update
+          sudo apt-get install -y jq unzip wget curl
+
+          CHROME_VERSION=$(google-chrome --version | grep -oP '\d+\.\d+\.\d+\.\d+')
+          CHROMEDRIVER_VERSION=$(curl -s "https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions-with-downloads.json" \
+            | jq -r --arg ver "$CHROME_VERSION" '
+              .channels.Stable.downloads.chromedriver[] 
+              | select(.platform == "linux64") 
+              | .url' \
+            | head -n 1)
+
+          wget "$CHROMEDRIVER_VERSION" -O chromedriver.zip
+          unzip chromedriver.zip
+          sudo mv chromedriver-linux64/chromedriver /usr/local/bin/
           chromedriver --version
 
       - name: Run Selenium Test
         env:
           DISPLAY: :99
         run: |
-          Xvfb :99 &  # headless display
+          Xvfb :99 &
           python test_weather_shopper.py
