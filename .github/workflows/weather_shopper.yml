@@ -54,4 +54,4 @@ jobs:
           DISPLAY: :99
         run: |
           Xvfb :99 &
-          python test_weather_shopper.py
+          python tests/test_weather_shopper.py
