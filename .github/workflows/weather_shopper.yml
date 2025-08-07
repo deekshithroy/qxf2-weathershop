@@ -51,6 +51,9 @@ jobs:
           sudo mv chromedriver-linux64/chromedriver /usr/local/bin/
           chmod +x /usr/local/bin/chromedriver
           chromedriver --version
+          
+      - name: Install x11vnc
+        run: sudo apt-get install -y x11vnc
 
       - name: Run Selenium Tests in Headless Mode
         env:
