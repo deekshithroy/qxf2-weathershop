@@ -28,39 +28,31 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y wget unzip xvfb \
-          libnss3 libxss1 libappindicator3-1 fonts-liberation \
-          libatk-bridge2.0-0 libgtk-3-0 libasound2t64 \
-          libx11-xcb1 libxcomposite1 libxdamage1 libxrandr2 libgbm1
+            libnss3 libxss1 libappindicator3-1 fonts-liberation \
+            libatk-bridge2.0-0 libgtk-3-0 libasound2t64 \
+            libx11-xcb1 libxcomposite1 libxdamage1 libxrandr2 libgbm1
           wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
           sudo apt install -y ./google-chrome-stable_current_amd64.deb
 
       - name: Install ChromeDriver matching Chrome version
         run: |
-          sudo apt-get update
           sudo apt-get install -y jq curl
-
           CHROME_VERSION=$(google-chrome --version | grep -oP '\d+\.\d+\.\d+\.\d+')
           CHROMEDRIVER_URL=$(curl -s "https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions-with-downloads.json" \
             | jq -r --arg ver "$CHROME_VERSION" '
               .channels.Stable.downloads.chromedriver[] 
               | select(.platform == "linux64") 
               | .url')
-
           wget "$CHROMEDRIVER_URL" -O chromedriver.zip
           unzip chromedriver.zip
           sudo mv chromedriver-linux64/chromedriver /usr/local/bin/
           chmod +x /usr/local/bin/chromedriver
           chromedriver --version
-          
-      - name: Install x11vnc
-        run: sudo apt-get install -y x11vnc
 
       - name: Run Selenium Tests in Headless Mode
         env:
-          DISPLAY: :20
+          DISPLAY: :99
         run: |
-          Xvfb :20 -screen 0 1366x768x16 & x11vnc -passwd password -display :20 -N -forever &
-          export DISPLAY=:20
+          Xvfb :99 -screen 0 1920x1080x24 > /dev/null 2>&1 &
           sleep 3  # wait for Xvfb to start
           pytest tests/test_weather_shopper.py
-
