@@ -27,21 +27,32 @@ jobs:
       - name: Install Google Chrome
         run: |
           sudo apt-get update
-          sudo apt-get install -y wget unzip xvfb
+          sudo apt-get install -y wget unzip xvfb libxi6 libgconf-2-4 libnss3 libxss1 libappindicator1 libindicator7 fonts-liberation libatk-bridge2.0-0 libgtk-3-0
           wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
           sudo apt install -y ./google-chrome-stable_current_amd64.deb
 
-      - name: Install ChromeDriver
+      - name: Install ChromeDriver matching Chrome version
         run: |
-          CHROME_VERSION=$(google-chrome --version | cut -d " " -f 3 | cut -d "." -f 1)
-          wget https://chromedriver.storage.googleapis.com/${CHROME_VERSION}.0.0/chromedriver_linux64.zip
-          unzip chromedriver_linux64.zip
-          sudo mv chromedriver /usr/local/bin/
+          sudo apt-get update
+          sudo apt-get install -y jq curl
+
+          CHROME_VERSION=$(google-chrome --version | grep -oP '\d+\.\d+\.\d+\.\d+')
+          CHROMEDRIVER_URL=$(curl -s "https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions-with-downloads.json" \
+            | jq -r --arg ver "$CHROME_VERSION" '
+              .channels.Stable.downloads.chromedriver[] 
+              | select(.platform == "linux64") 
+              | .url')
+
+          wget "$CHROMEDRIVER_URL" -O chromedriver.zip
+          unzip chromedriver.zip
+          sudo mv chromedriver-linux64/chromedriver /usr/local/bin/
+          chmod +x /usr/local/bin/chromedriver
           chromedriver --version
 
-      - name: Run Selenium Test
+      - name: Run Selenium Tests in Headless Mode
         env:
           DISPLAY: :99
         run: |
-          Xvfb :99 &  # headless display
-          python test_weather_shopper.py
+          Xvfb :99 -screen 0 1920x1080x24 > /dev/null 2>&1 &
+          sleep 3  # wait for Xvfb to start
+          pytest tests/test_weather_shopper.py
