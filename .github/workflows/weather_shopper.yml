@@ -17,7 +17,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '3.12'
 
       - name: Install dependencies
         run: |
@@ -54,9 +54,10 @@ jobs:
 
       - name: Run Selenium Tests in Headless Mode
         env:
-          DISPLAY: :99
+          DISPLAY: :20
         run: |
-          Xvfb :99 -screen 0 1920x1080x24 > /dev/null 2>&1 &
+          Xvfb :20 -screen 0 1366x768x16 & x11vnc -passwd password -display :20 -N -forever &
+          export DISPLAY=:20
           sleep 3  # wait for Xvfb to start
           pytest tests/test_weather_shopper.py
 
